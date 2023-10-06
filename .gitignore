@@ -1,0 +1,18 @@
+# confidential info
+/config.json
+/data.db
+/images.db
+
+# all bot sessions
+*.session
+
+# don't upload garbage
+/err_logs/*
+/images/.
+*.DS_Store
+
+# python 3.12 modules in "reqierements.txt"
+venv
+
+# other useless stuff
+.idea
