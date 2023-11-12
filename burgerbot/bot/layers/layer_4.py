@@ -5,6 +5,7 @@ from telethon import Button
 from telethon.errors import MessageNotModifiedError
 from telethon.events import InlineQuery, CallbackQuery
 
+from burgerbot.bot.layers.layer_3 import BotLayer3
 from burgerbot.db import Data
 from burgerbot.lang import Lang
 from burgerbot.bot.layers.layer_2 import BotLayer2
@@ -12,11 +13,11 @@ from burgerbot.config import BotConfig
 from burgerbot.media import Media
 
 
-class BotLayer3(BotLayer2):
+class BotLayer4(BotLayer3):
     def __init__(self, data: Data, media: Media, lang: Lang, bot_config: BotConfig):
         super().__init__(data=data, media=media, lang=lang, bot_config=bot_config)
 
-        self.bot.add_event_handler(self.inline_query, InlineQuery())
+        self.bot.add_event_handler(lambda e: self.inline_query_handler(self.inline_query, e), InlineQuery())
 
     async def inline_query_handler(self, func: Callable,  event: InlineQuery.Event):
         try:
@@ -24,22 +25,15 @@ class BotLayer3(BotLayer2):
         except Exception as ex:
             raise ex
 
+    # THIS IS TEST
     async def inline_query(self, event: InlineQuery.Event):
         sid = event.sender.id
         builder = event.builder
 
-        self.data.inline_query_by(self.data.user(event.sender.id), event.text)
+        button_data = f"burger"
 
-        if self.media_uploaded:
-            button_data = f"v1-open-it {sid}"
-            response = [
-                builder.photo(self.media.open_it, buttons=[Button.inline("✅ Открыть", data=button_data)]),
-                builder.photo(self.images.free_robux, buttons=[Button.inline("🤑 Получить", data=button_data)]),
-                builder.photo(self.images.open_please, buttons=[Button.inline("🙂 Открыть", data=button_data)]),
-                builder.photo(self.images.free_tg_prem, buttons=[Button.inline("🎁 Забрать", data=button_data)]),
-                builder.photo(self.images.defend_your_account,
-                              buttons=[Button.inline("ℹ️ Подробнее", data=button_data)])
-            ] if event.text.lower() != "glookipail" else [
-                builder.photo(self.images.glookipail, buttons=[Button.inline("💬 Написать", data=button_data)])
-            ]
-            await event.answer(response, gallery=True)
+        response = [
+            builder.photo(self.media.error, buttons=[Button.inline("test", data=button_data)]),
+        ]
+
+        await event.answer(response, gallery=True)
