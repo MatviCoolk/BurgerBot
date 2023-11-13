@@ -1,3 +1,3 @@
-from burgerbot.bot.layers.layer_4 import BotLayer4
+from burgerbot.bot.layers import BotFinalLayer
 
-Bot = BotLayer4
+Bot = BotFinalLayer
