@@ -10,7 +10,7 @@ from burgerbot.buttons import Buttons
 from burgerbot.config import BotConfig
 from burgerbot.db import Data
 from burgerbot.media import Media, BotMedia
-from burgerbot.lang import Lang, DEFAULT_LANG_CODE
+from burgerbot.lang import Lang, DEFAULT_LANG_CODE, Language
 
 
 class BotLayer1:
@@ -31,18 +31,19 @@ class BotLayer1:
         # markdown doesn't have underlining >:O
         self.bot = TelegramClient(self.config.session, self.config.app_id, self.config.app_hash)
         self.bot.parse_mode = 'html'
-        self.bot.start(bot_token=self.config.token)
 
         # status
         self.running = False
         self.media_uploaded = False
 
-        asyncio.ensure_future(self.async_init())
+        asyncio.run(self.async_init())
 
     async def async_init(self):
+        await self.bot.start(bot_token=self.config.token)
         self.me = await self.bot.get_me()
         self.username = self.me.username
         self.id = self.me.id
+        print(self.bot.is_connected())
 
         with open(self.config.necessary_media, 'r') as necessary_media_file:
             self.media = await self.media_full.bot(json.load(necessary_media_file), self.bot, self.id)
@@ -58,7 +59,7 @@ class BotLayer1:
     async def msg(self, entity, message, buttons=None, file=None, link_preview=False, reply_to=None) -> Message:
         return await self.bot.send_message(entity=entity, message=message, buttons=buttons, file=file, link_preview=link_preview, reply_to=reply_to)
 
-    def lang(self, lang_code: Union[None, str, int, NewMessage.Event, InlineQuery.Event, CallbackQuery.Event]):
+    def lang(self, lang_code: Union[None, str, int, NewMessage.Event, InlineQuery.Event, CallbackQuery.Event]) -> Language:
         match lang_code:
             case None:
                 return self.__lang(DEFAULT_LANG_CODE)

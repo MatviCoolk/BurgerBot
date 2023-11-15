@@ -31,13 +31,14 @@ class BotLayer3(BotLayer2):
                 pass
             except Exception as ex:
                 try:
-                    await event.edit(self.lang(event).error_occurred + ex.__str__(), file=self.media.error)
+                    await event.edit(self.lang(event).error + ex.__str__(), file=self.media.error,
+                                     buttons=[self.buttons.into_the_menu(event), self.buttons.report_error(event)])
                 except Exception as ex1:
                     try:
-                        await event.reply(self.lang(event).error_occurred + ex.__str__())
+                        await event.reply(self.lang(event).error + ex.__str__(),
+                                          buttons=[self.buttons.into_the_menu(event), self.buttons.report_error(event)])
                     except:
-                        pass
-                        raise ex1
+                        raise ex
                 raise ex
 
     async def start_cq(self, event: CallbackQuery.Event):
@@ -47,7 +48,7 @@ class BotLayer3(BotLayer2):
 
     async def usage_cq(self, event: CallbackQuery.Event):
         sid = event.sender.id
-        await event.edit(self.lang(sid).how_to_use, file=self.media.usage, link_preview=False,
+        await event.edit(self.lang(sid).usage, file=self.media.usage, link_preview=False,
                          buttons=[self.buttons.back(event)])
 
     async def faq_cq(self, event: CallbackQuery.Event):
@@ -78,5 +79,5 @@ class BotLayer3(BotLayer2):
             await self.more_main_cq(event)
 
     async def unknown_cq(self, event: CallbackQuery.Event):
-        await event.edit(self.lang(event).error_occurred + f"(OK) Unsupported callback query [{len(event.data)}]: b\"{str(event.data)[2:-1]}\"", file=self.media.error, link_preview=False,
+        await event.edit(self.lang(event).error + f"(OK) Unsupported callback query [{len(event.data)}]: b\"{str(event.data)[2:-1]}\"", file=self.media.error, link_preview=False,
                          buttons=[self.buttons.into_the_menu(event), self.buttons.report_error(event)])

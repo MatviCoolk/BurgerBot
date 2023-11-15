@@ -1,3 +1,4 @@
+import asyncio
 import os
 import signal
 from typing import List
@@ -10,10 +11,13 @@ from burgerbot.db import Data
 from burgerbot.lang import Lang
 from burgerbot.media import Media
 
+import nest_asyncio
+nest_asyncio.apply()
+
 PROCESS_TITLE = 'BURGER-BOT'
 
 
-def run(path_to_config_file):
+def run(path_to_config_file: str = 'config.json'):
     setproctitle(PROCESS_TITLE)
 
     config = Config(path_to_config_file)
@@ -29,7 +33,7 @@ def run(path_to_config_file):
             bot.stop()
 
         for data_sing in data.values():
-            data_sing.save_and_close()
+            asyncio.run(data_sing.save_and_close())
 
         exit()
 
@@ -46,11 +50,12 @@ def run(path_to_config_file):
             if bot_config.media not in media.keys():
                 media[bot_config.media] = Media(bot_config.media)
 
-            bots.append(Bot(data[bot_config.db_path], media[bot_config.media], lang[bot_config.lang_config_path], bot_config))
+            bots.append(
+                Bot(data[bot_config.db_path], media[bot_config.media], lang[bot_config.lang_config_path], bot_config))
 
     for bot in bots:
-        bot.bot.run_until_disconnected()
+        asyncio.run(bot.bot.disconnected)
         bot.stop()
 
     for data_sing in data.values():
-        data_sing.save_and_close()
+        asyncio.run(data_sing.save_and_close())

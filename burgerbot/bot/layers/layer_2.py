@@ -1,4 +1,3 @@
-from telethon import Button
 from telethon.events import NewMessage
 
 from burgerbot.db import Data
@@ -17,17 +16,21 @@ class BotLayer2(BotLayer1):
         self.bot.add_event_handler(lambda e: self.new_message_handler(self.author_cmd, e), NewMessage(pattern='/author'))
         self.bot.add_event_handler(lambda e: self.new_message_handler(self.usage_cmd, e), NewMessage(pattern='/usage'))
         self.bot.add_event_handler(lambda e: self.new_message_handler(self.any_msg, e), NewMessage())
+        self.bot.add_event_handler(lambda e: self.new_message_handler(self.non_cmd_msg, e), NewMessage(pattern='^(?!/start|/bug|/author|/usage).*'))
 
     async def new_message_handler(self, func, event: NewMessage.Event):
         if self.running:
             try:
                 await func(event)
             except Exception as ex:
-                await event.reply(self.lang(event).error_occurred)
+                await event.reply(self.lang(event).error + ex.__str__(), buttons=[self.buttons.into_the_menu(event), self.buttons.report_error(event)])
                 raise ex
 
+    async def non_cmd_msg(self, event: NewMessage.Event):
+        await event.reply("non cmd")
+
     async def any_msg(self, event: NewMessage.Event):
-        print(event)
+        await event.reply("any")
 
     async def start_cmd(self, event: NewMessage.Event):
         await event.respond(self.lang(event).format_start(self.username, event.sender), file=self.media.burger_bot,
@@ -42,5 +45,5 @@ class BotLayer2(BotLayer1):
                             buttons=self.buttons.author_cmd(event))
 
     async def usage_cmd(self, event: NewMessage.Event):
-        await event.respond(self.lang(event).how_to_use, file=self.media.usage,
+        await event.respond(self.lang(event).usage, file=self.media.usage,
                             buttons=[self.buttons.into_the_menu(event)])

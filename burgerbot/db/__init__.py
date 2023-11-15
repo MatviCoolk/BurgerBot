@@ -1,56 +1,38 @@
 import asyncio
-import sqlite3
 
+from burgerbot.db.base import BaseData
 from burgerbot.db.user import User
 
 
-class Data:
+class Data(BaseData):
     def __init__(self, path: str = 'data.db'):
-        self.path: str = path
+        super().__init__(path)
 
-        # initialize sqlite3
-        self.connection = sqlite3.connect(self.path)
-        self.cursor = self.connection.cursor()
+        asyncio.get_event_loop().run_until_complete(self._async_init())
 
-        self.burgers, self.inline_queries, self.callback_queries = {}, {}, {}
+    async def _async_init(self):
+        await super()._async_init()
 
-        self.users = {}
-
-        for db_result in self.cursor.execute("SELECT * FROM users").fetchall():
+        for db_result in await self.db_exec_fetchall("SELECT * FROM users"):
             user = User(self, db_result)
             self.users[user.tg_id] = user
             self.users[-user.id] = user
 
-
-        # shorthands
-        self.usr = self.user
-
-        asyncio.ensure_future(self.auto_commit())
-
-    def save(self):
-        for user in self.users.values():
-            user.update()
-        self.connection.commit()
-
-    async def auto_commit(self):
-        while True:
-            await asyncio.sleep(60 * 5)
-            self.save()
-
-    def save_and_close(self):
-        self.save()
-        self.cursor.execute('VACUUM')
-        self.connection.close()
-
-    def user(self, user_id: int) -> User:
+    async def _get_user(self, user_id: int) -> User:
         if user_id in self.users.keys():
             return self.users[user_id]
 
-        db_result = self.cursor.execute(f"SELECT * FROM users WHERE id = \'{user_id}\'").fetchone()
-        if db_result is None:
-            user = User(self, (user_id,)).update()
-        else:
-            user = User(self, db_result)
+        db_result = await self.db_exec_fetchone(f"SELECT * FROM users WHERE telegram_id = \'{user_id}\'")
 
-        self.users[user_id] = user
-        return user
+        if db_result is not None:
+            usr = User(self, db_result)
+        else:
+            usr = User(self, (user_id,))
+
+        self.users[user_id] = usr
+        return usr
+
+    def usr(self, user_id: int) -> User:
+        future = asyncio.Future()
+        self.add_to_queue(self._get_user(user_id), future)
+        return asyncio.get_event_loop().run_until_complete(future)
