@@ -57,3 +57,10 @@ class Buttons:
             [self.back(event, 'more-main'),
              Button.inline('⚠️ ' + lang_buttons.bug_found, 'bug-found more-next')]
         ]
+
+    def send_another_msg(self, event: Union[NewMessage.Event, CallbackQuery.Event]):
+        lang_buttons = self.lang(event).buttons
+
+        return [
+            Button.inline('💬 ' + 'lang_buttons.send_another_msg', 'send-another-msg')
+        ]

@@ -17,13 +17,11 @@ class User:
         self.tg_id = db_result[1]
 
         # info & settings
-        info = db_result[3]
-        self.dialog_started = bool(info % 2)
-        self.blocked = bool((info >> 1) % 2)
+        self.dialog_started = bool(db_result[3] % 2)
+        self.blocked = bool((db_result[3] >> 1) % 2)
 
-        settings = db_result[4]
-        self.show_about_in_start_msg = bool(settings % 2)
-        self.forward_channel_posts = bool((settings >> 1) % 2)
+        self.show_about_in_start_msg = bool(db_result[4] % 2)
+        self.forward_channel_posts = bool((db_result[4] >> 1) % 2)
 
         # events
         self.burger_ids = decode(db_result[5])
@@ -36,10 +34,6 @@ class User:
         self.reputation = db_result[9]
         self.md_link = db_result[10]
         self.lang_code = db_result[11]
-
-        self.last_msg_time = 0
-        self.deleted_msgs = 0
-        self.is_writing_message = False
 
         self.db = db
 
