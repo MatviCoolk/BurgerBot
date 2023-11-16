@@ -46,8 +46,6 @@ class Config:
 
         for main, clones in self.json['clones'].items():
             for clone in clones:
-                print(clone)
-                print(main_bots[main].json)
                 self.bots.append(BotConfig(clone, main_bots[main].json))
 
         self.testing: bool = self.json['testing']
