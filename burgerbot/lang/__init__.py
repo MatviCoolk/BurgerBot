@@ -10,7 +10,7 @@ DEFAULT_LANG_CODE = 'ru'
 
 
 class LanguageButtons(object):
-    into_the_menu: str; usage: str; back: str; author: str; faq: str; join_development: str; idea: str;
+    into_the_menu: str; usage: str; back: str; faq: str; join_development: str; idea: str;
     upload_burger: str; bug_found: str; report: str; profile: str; subscribe: str; more: str; forwarding: str;
     next: str; share: str; msg_again: str
 

@@ -36,4 +36,6 @@ class BotLayer4(BotLayer3):
             builder.photo(self.media.error, buttons=[Button.inline("test", data=button_data)]),
         ]
 
-        await event.answer(response, gallery=True)
+        await event.answer(response, gallery=True, cache_time=0, switch_pm='Начать использовать', switch_pm_param='l')
+
+        self.db.inline_query_by(sid, event.text)

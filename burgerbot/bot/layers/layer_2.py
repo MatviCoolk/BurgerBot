@@ -25,7 +25,7 @@ class BotLayer2(BotLayer1):
             try:
                 await func(event)
             except Exception as ex:
-                await event.reply(self.lang(event).error + ex.__str__(), buttons=[self.buttons.into_the_menu(event), self.buttons.report_error(event)])
+                await event.reply(self.lang(event).error + str(ex), buttons=[self.buttons.report_error(event)])
                 raise ex
 
     async def non_cmd_msg(self, event: NewMessage.Event):
@@ -39,7 +39,6 @@ class BotLayer2(BotLayer1):
             await event.respond(event.message.message, file=event.message.media)
         except:
             await event.forward_to(event.chat)
-
 
     async def start_cmd(self, event: NewMessage.Event):
         await event.respond(self.lang(event).format_start(self.username, event.sender), file=self.media.burger_bot,

@@ -50,8 +50,7 @@ def run(path_to_config_file: str = 'config.json'):
             if bot_config.media not in media.keys():
                 media[bot_config.media] = Media(bot_config.media)
 
-            bots.append(
-                Bot(data[bot_config.db_path], media[bot_config.media], lang[bot_config.lang_config_path], bot_config))
+            bots.append(Bot(data[bot_config.db_path], media[bot_config.media], lang[bot_config.lang_config_path], bot_config))
 
     for bot in bots:
         asyncio.run(bot.bot.disconnected)

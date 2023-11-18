@@ -43,7 +43,6 @@ class BotLayer1:
         self.me = await self.bot.get_me()
         self.username = self.me.username
         self.id = self.me.id
-        print(self.bot.is_connected())
 
         with open(self.config.necessary_media, 'r') as necessary_media_file:
             self.media = await self.media_full.bot(json.load(necessary_media_file), self.bot, self.id)
