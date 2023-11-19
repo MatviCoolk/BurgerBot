@@ -14,7 +14,7 @@ UPLOADS_TABLE = 'uploads_bot'
 
 
 class BotMedia:
-    REQUIRED_NECESSARY_MEDIA = {'under_construction', 'burger_bot', 'bug_found', 'error', 'usage', 'faq', 'more'}
+    REQUIRED_NECESSARY_MEDIA = {'under_construction', 'burger_bot', 'bug_found', 'error', 'usage', 'faq', 'more', 'you_just_got_burgered'}
 
     under_construction: MessageMediaPhoto
     burger_bot: MessageMediaPhoto
@@ -23,6 +23,7 @@ class BotMedia:
     usage: MessageMediaDocument
     faq: MessageMediaPhoto
     more: MessageMediaPhoto
+    you_just_got_burgered: MessageMediaPhoto
 
     def __init__(self, necessary: Dict[str, Union[MessageMediaPhoto, MessageMediaDocument]]):
         # if set(necessary.keys()) & self.REQUIRED_NECESSARY_MEDIA != self.REQUIRED_NECESSARY_MEDIA:

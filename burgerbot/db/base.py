@@ -65,8 +65,8 @@ class BaseData:
             request, future = self.deque.popleft()
             print(request)
             result = await request
+            print('result: ' + str(result))
             if future is not None:
-                print('result')
                 future.set_result(result)
 
     def add_to_queue(self, coroutine, future=None):

@@ -6,6 +6,7 @@ from telethon.errors import MessageNotModifiedError
 from telethon.events import InlineQuery, CallbackQuery
 
 from burgerbot.bot.layers.layer_3 import BotLayer3
+from burgerbot.buttons import CQ_PREFIX
 from burgerbot.db import Data
 from burgerbot.lang import Lang
 from burgerbot.bot.layers.layer_2 import BotLayer2
@@ -30,12 +31,18 @@ class BotLayer4(BotLayer3):
         sid = event.sender.id
         builder = event.builder
 
-        button_data = f"burger"
+        iq_id = self.db.inline_query_by(sid, event.text).id
+
+        usr = self.db.usr(sid)
+
+        # if usr.blocked or not usr.dialog_started:
+        #     await event.answer([], gallery=True, cache_time=20, switch_pm='/start — Запустить бота',
+        #                        switch_pm_param='iq_start', private=True)
+
+        button_data = f"{CQ_PREFIX}burger {iq_id}"
 
         response = [
             builder.photo(self.media.error, buttons=[Button.inline("test", data=button_data)]),
         ]
 
-        await event.answer(response, gallery=True, cache_time=0, switch_pm='Начать использовать', switch_pm_param='l')
-
-        self.db.inline_query_by(sid, event.text)
+        await event.answer(response, gallery=True, cache_time=0, switch_pm='Начать использовать', switch_pm_param='l', private=True)

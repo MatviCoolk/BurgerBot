@@ -23,18 +23,18 @@ class BotLayer3(BotLayer2):
         self.add_cq_event_handler(self.more_next_cq, 'more-next')
         self.add_cq_event_handler(self.fwd_cq, 'fwd')
         self.add_cq_event_handler(self.bug_found_cq, 'bug-found')
-        self.add_cq_event_handler(self.unknown_cq, '^(?!start|usage|faq|more|fwd|bug-found).*')
+        self.add_cq_event_handler(self.burger_cq, 'burger')
+        self.add_cq_event_handler(self.unknown_cq, f"^(?!{CQ_PREFIX}(start|usage|faq|more|fwd|bug-found|burger)).*", add_prefix=False)
 
-    def add_cq_event_handler(self, func, data):
-        self.bot.add_event_handler(lambda e: self.callback_query_handler(func, e), CallbackQuery(pattern=CQ_PREFIX + data))
+    def add_cq_event_handler(self, func, data, add_prefix=True):
+        pattern = CQ_PREFIX + data if add_prefix else data
+        self.bot.add_event_handler(lambda e: self.callback_query_handler(func, e), CallbackQuery(pattern=pattern))
 
     async def callback_query_handler(self, func, event: CallbackQuery.Event):
+        print(event)
         if self.running:
-            print(event.data.decode())
-            print(func)
             try:
                 await func(event)
-                print('done')
             except MessageNotModifiedError:
                 pass
             except Exception as ex:
@@ -81,6 +81,10 @@ class BotLayer3(BotLayer2):
 
         if query[2].remove_prefix(CQ_PREFIX) == 'more-main':
             await self.more_main_cq(event)
+
+    async def burger_cq(self, event: CallbackQuery.Event):
+        await event.edit(self.lang(event).just_got_burgered(event.sender, self.db), link_preview=False,
+                         file=self.media.you_just_got_burgered)
 
     async def unknown_cq(self, event: CallbackQuery.Event):
         await event.edit(self.lang(event).error + f"(OK) Unsupported callback query [{len(event.data)}]: b\"{str(event.data)[2:-1]}\"", file=self.media.error, link_preview=False,

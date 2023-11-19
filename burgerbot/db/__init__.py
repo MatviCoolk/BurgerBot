@@ -7,7 +7,7 @@ from burgerbot.db.user import User
 
 
 def missing_id(ids: set):
-    return list(set(range(max(list(ids | {0})) + 1)).difference(ids))[0]
+    return list(set(range(max(list(ids | {0})) + 2)).difference(ids))[0]
 
 
 class Data(BaseData):
@@ -22,6 +22,14 @@ class Data(BaseData):
         for db_result in await self.db_exec_fetchall('SELECT * FROM users'):
             user = User(self, db_result)
             self.users[user.id] = user
+
+        for db_result in await self.db_exec_fetchall('SELECT * FROM burgers'):
+            burger = Burger(self, db_result)
+            self.burgers[burger.id] = burger
+
+        for db_result in await self.db_exec_fetchall('SELECT * FROM inline_query'):
+            iq = Burger(self, db_result)
+            self.inline_queries[iq.id] = iq
 
     async def _get_user(self, user_id: int) -> User:
         if user_id in self.users.keys():
@@ -64,6 +72,7 @@ class Data(BaseData):
 
         iq = InlineQuery(self, (iq_id, user_id, query, datetime.datetime.now(), None), insert=True)
         self.inline_queries[iq_id] = iq_id
+        self.usr(user_id).inline_query_ids.append(iq.id)
         return iq
 
     def burger(self, user_id: int, inline_query_id: int) -> Burger:
@@ -71,6 +80,7 @@ class Data(BaseData):
 
         burger = Burger(self, (burger_id, user_id, inline_query_id, datetime.datetime.now()), insert=True)
         self.burgers[burger_id] = burger
+        self.usr(user_id).burger_ids.append(burger.id)
         return burger
 
     def get_inline_query(self, iq_id):
